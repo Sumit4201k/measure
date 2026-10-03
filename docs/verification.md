@@ -16,3 +16,4 @@
 One initial automation click occurred before hydration and timed out. The check now waits for the app's initialized state; the subsequent full run passed.
 
 No video was produced, per the user's updated instruction.
+`nVisible Stitch update: TypeScript passed; dedicated browser checks cover composer, create-screen simulation, style selection, failure, recovery comparison, and mobile overflow.

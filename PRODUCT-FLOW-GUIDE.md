@@ -128,3 +128,11 @@ These were applied to this task; no global skill installation was performed.
 ## Verification and known limitations
 
 Check `docs/verification.md` for actual test results. Native screen text is deliberately scaled inside the miniature phone preview; campaign controls and responsive layout are independently usable. Real Stitch success remains unverified without credentials. Browser WebMCP support is optional; ordinary browser controls work without it.
+
+## Visible Stitch workflow update
+
+The main headline now introduces Stitch first: “Design it with Stitch. See it through Measure.” A three-step strip connects prompt-to-screen, Measure failure context, and Stitch recovery.
+
+The on-page Stitch workspace shows a scenario-specific design brief, Calm editorial / Bold violet presets, Create screen · demo, context from Measure, and Stitch recovery · demo. The selected preset changes the prepared phone design. Initial screen creation is explicitly a frontend simulation; it does not call Stitch. Recovery uses the existing live backend only when credentials are configured. Otherwise it remains a labeled prepared example. Live recovery follows the backend's curated design constraints; the theme selector controls the prepared frontend preview.
+
+The app journey is displayed below the canvas. Measure keeps the real-product destination and campaign CTA. No video was added.
