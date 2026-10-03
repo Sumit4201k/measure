@@ -17,3 +17,10 @@ One initial automation click occurred before hydration and timed out. The check 
 
 No video was produced, per the user's updated instruction.
 `nVisible Stitch update: TypeScript passed; dedicated browser checks cover composer, create-screen simulation, style selection, failure, recovery comparison, and mobile overflow.
+
+## Vercel readiness — 2026-10-03
+- Standard Next.js production build passed (local Node 24; deployment configured for Node 22).
+- Production-browser checks passed: Stitch demo creation, theme preset, failure/recovery comparison, mobile width, and no runtime errors.
+- API checks passed: unconfigured 503, missing/incorrect code 401, spoofed Sites header 401, invalid scenario 400, cross-origin 403.
+- Live provider generation was not tested because no real Stitch API key was configured. Vercel deployment has not been performed.
+

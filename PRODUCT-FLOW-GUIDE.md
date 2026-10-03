@@ -1,5 +1,7 @@
 # Measure Flow — Product and Marketing Guide
 
+**Vercel migration:** standard `npm run dev`, `npm run build`, and `npm start` now run Next.js. For current deployment and live-generation authentication, follow [VERCEL-DEPLOY.md](VERCEL-DEPLOY.md). The historical Sites setup below describes the original preview; its identity-header authentication has been replaced by a server-verified private demo access code.
+
 ## What you have
 
 A responsive marketing demo in `C:\Users\hp\Documents\vscodee\measure-flow`. It combines a mobile screen, an animated journey, and a simulated event timeline. Its purpose is to encourage developers to explore Measure after seeing why a polished interface alone cannot explain production failures.
@@ -76,7 +78,7 @@ STITCH_PROJECT_ID=optional-existing-stitch-project-id
 4. Restart the local preview or redeploy the hosted version so the environment is applied.
 5. Open Stitch integration and confirm Connected. Generate a test design and verify the returned preview.
 
-Hosted live generation additionally requires the authenticated identity supplied by the private Sites deployment. The local starter supplies its mock sign-in identity. Do not bypass this check for an unrestricted public rollout.
+Live generation now requires `STITCH_DEMO_TOKEN` on the server and the matching access code entered in the Stitch integration dialog. The app no longer trusts Sites identity headers. See VERCEL-DEPLOY.md for the current setup.
 
 The current session had no Stitch credentials, so credentialed generation could not be tested. A prepared recovery is never presented as live output. On provider failure the UI reports failure; the prepared example remains available through the integration dialog.
 

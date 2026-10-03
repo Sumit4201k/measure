@@ -1,20 +1,26 @@
 import {Stitch,StitchToolClient} from "@google/stitch-sdk";
-import {env} from "cloudflare:workers";
+import {timingSafeEqual} from "node:crypto";
 
-type Settings={STITCH_API_KEY?:string;STITCH_PROJECT_ID?:string;STITCH_ENABLED?:string};
-const settings=()=>env as unknown as Settings;
+export const runtime="nodejs";
+export const maxDuration=240;
+export const dynamic="force-dynamic";
+
+type Settings={STITCH_API_KEY?:string;STITCH_PROJECT_ID?:string;STITCH_ENABLED?:string;STITCH_DEMO_TOKEN?:string};
+const settings=():Settings=>({STITCH_API_KEY:process.env.STITCH_API_KEY,STITCH_PROJECT_ID:process.env.STITCH_PROJECT_ID,STITCH_ENABLED:process.env.STITCH_ENABLED,STITCH_DEMO_TOKEN:process.env.STITCH_DEMO_TOKEN});
 const prompts:Record<string,string>={
  search:"Search timeout for a travel app named roam. Preserve the query Weekend in Kyoto. Explain the timeout, offer Try search again, and never promise retry success.",
  upload:"Interrupted file upload in an app named folio. Keep Brand explorations.fig selected. Offer Try upload again. Do not claim server-side resume support.",
  checkout:"Unconfirmed order in an app named form. Offer Check order status before any repeat payment. Never tell the user payment failed definitively or promise safe duplicate payment."
 };
 let inFlight=false,lastStarted=0;
-export async function GET(){const s=settings();return Response.json({configured:!!s.STITCH_API_KEY&&s.STITCH_ENABLED==="true",mode:s.STITCH_API_KEY&&s.STITCH_ENABLED==="true"?"live":"prepared"},{headers:{"Cache-Control":"no-store"}});}
+export async function GET(){const s=settings();return Response.json({configured:!!s.STITCH_DEMO_TOKEN&&!!s.STITCH_API_KEY&&s.STITCH_ENABLED==="true",mode:s.STITCH_DEMO_TOKEN&&s.STITCH_API_KEY&&s.STITCH_ENABLED==="true"?"live":"prepared"},{headers:{"Cache-Control":"no-store"}});}
 export async function POST(request:Request){
  const origin=request.headers.get("origin");if(origin&&origin!==new URL(request.url).origin)return Response.json({error:"Cross-origin generation is not allowed."},{status:403});
- const s=settings();if(!s.STITCH_API_KEY||s.STITCH_ENABLED!=="true")return Response.json({error:"Live Stitch is not configured. Explore the prepared example instead."},{status:503});
- // The private deployment is the access boundary; additionally require its authenticated identity.
- if(!request.headers.get("oai-authenticated-user-id"))return Response.json({error:"Sign in to this private demo to generate a design."},{status:401});
+ const s=settings();if(!s.STITCH_DEMO_TOKEN||!s.STITCH_API_KEY||s.STITCH_ENABLED!=="true")return Response.json({error:"Live Stitch is not configured. Explore the prepared example instead."},{status:503});
+ // Never trust platform-specific identity headers on a public Vercel deployment.
+ const supplied=Buffer.from(request.headers.get("authorization")?.replace(/^Bearer /, "")||"");
+ const expected=Buffer.from(s.STITCH_DEMO_TOKEN);
+ if(supplied.length!==expected.length||!timingSafeEqual(supplied,expected))return Response.json({error:"Enter the private demo access code in Stitch integration to generate a live design."},{status:401});
  if(Number(request.headers.get("content-length")||0)>1024)return Response.json({error:"Request too large."},{status:413});
  let scenario:string;try{const body=await request.text();if(body.length>1024)throw Error();scenario=JSON.parse(body).scenario;if(!Object.hasOwn(prompts,scenario))throw Error();}catch{return Response.json({error:"Choose a supported scenario."},{status:400});}
  if(inFlight||Date.now()-lastStarted<60000)return Response.json({error:"A design is running or cooling down. Please wait before trying again."},{status:429});
